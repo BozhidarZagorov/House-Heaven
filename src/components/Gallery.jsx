@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link, useSearchParams } from "react-router"
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc } from "firebase/firestore";
 import { db } from "/public/config/firebaseinit";
 import { useAuth } from '/public/ctx/FirebaseAuth'
 import { useNavigate } from "react-router"
@@ -29,6 +29,23 @@ export default function Gallery() {
     const [displayPictures, setDisplayPictures] = useState([]);
 
     const { user, isAuthenticated } = useAuth(); //! auth ctx
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+    if (!user) {
+    setIsAdmin(false);
+    return;
+    }
+
+    const checkAdmin = async () => {
+    const ref = doc(db, "admin", user.uid);
+    const snap = await getDoc(ref);
+    setIsAdmin(snap.exists());
+    };
+
+    checkAdmin();
+    }, [user]);
+
 
     const navigate = useNavigate();
 
@@ -57,9 +74,10 @@ export default function Gallery() {
     }, [pictures, searchParams])
 
     const handleAddPictureBtn = () => {
-        if (!isAuthenticated) {
-            navigate("/login");
-            return alert('You must be logged in to add pictures.');
+        // if (!isAuthenticated) {
+        if (!isAdmin) {
+            navigate("/");
+            return alert('You do not have permission to do that.');
         } else {
             navigate("/gallery/addPicture");
         }
@@ -71,9 +89,11 @@ export default function Gallery() {
 
                 <div className="flex justify-center px-6 py-8 lg:px-8">
                     <div className="flex gap-x-12">
-                        <button onClick={handleAddPictureBtn} className="btn-orange">
-                            Add Picture
-                        </button>
+                        {isAdmin && (
+                            <button onClick={handleAddPictureBtn} className="btn-orange">
+                                Add Picture
+                            </button>
+                            )}
                     </div>
                 </div>
 

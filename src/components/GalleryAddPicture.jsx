@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { collection, addDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { collection, addDoc, getDoc, doc } from 'firebase/firestore';
 import { db } from '/public/config/firebaseinit';
 import { useAuth } from '/public/ctx/FirebaseAuth';
 import { useNavigate } from 'react-router'
@@ -12,8 +12,43 @@ export default function GalleryAddPicture() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { user, isAuthenticated } = useAuth(); //! auth ctx
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const navigate = useNavigate();
+
+    
+    
+   const [adminLoading, setAdminLoading] = useState(true);
+
+    useEffect(() => {
+        if (!user) {
+            setIsAdmin(false);
+            setAdminLoading(false);
+        return;
+    }
+
+  const checkAdmin = async () => {
+    try {
+      const ref = doc(db, "admin", user.uid);
+      const snap = await getDoc(ref);
+      setIsAdmin(snap.exists());
+    } catch (err) {
+      console.error("Admin check failed:", err);
+      setIsAdmin(false);
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  checkAdmin();
+}, [user]);
+
+    useEffect(() => {
+        if (!adminLoading && !isAdmin) {
+            alert("You do not have permission to do that.");
+            navigate("/",{replace: true});
+        }
+    }, [adminLoading, isAdmin, navigate]);
 
     const uploadImageToCloudinary = async (file) => {
         const formData = new FormData();
@@ -58,7 +93,7 @@ export default function GalleryAddPicture() {
             navigate('/gallery'); 
 
         } catch (e) {
-            setError('Error adding wobbler: ' + e.message);
+            setError('Error adding picture: ' + e.message);
         } finally {
             setLoading(false);
         }
