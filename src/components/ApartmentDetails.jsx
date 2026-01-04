@@ -245,10 +245,11 @@ export default function ApartmentDetails() {
               >
                 {showPhone ? "Hide Phone Number" : "Give us a call"}
               </button>
-
-              {isAuthenticated && showPhone && (
+                {/* {apartment.phone} */}
+                {/* {isAuthenticated && showPhone && ( */}
+              {showPhone && (
                 <p className="mt-4 text-center text-lg font-medium text-gray-900">
-                  📞 {apartment.phone}
+                  📞 088 654 8334 
                 </p>
               )}
             </div>

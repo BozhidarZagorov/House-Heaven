@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { collection, getDocs} from 'firebase/firestore'
+import { collection, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore'
 import { db } from '/public/config/firebaseinit'
+import { useAuth } from '/public/ctx/FirebaseAuth';
 
 import { CheckIcon } from '@heroicons/react/20/solid'
 import { UserIcon } from '@heroicons/react/24/solid';
@@ -13,7 +14,29 @@ function classNames(...classes) {
 export default function Apartments() {
     const [apartments, setApartments] = useState({})
     const [loading, setLoading] = useState(true)
+    const { user } = useAuth();
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [editingPrice, setEditingPrice] = useState(null);
+    const [newPrice, setNewPrice] = useState(   );
 
+    useEffect(() => {
+        if (!user) {
+            setIsAdmin(false);
+            return;
+        }
+
+    const checkAdmin = async () => {
+        try {
+          const snap = await getDoc(doc(db, "admin", user.uid)); // correct collection
+          setIsAdmin(snap.exists());
+        } catch (err) {
+          console.error("Admin check failed", err);
+          setIsAdmin(false);
+        }
+    };
+
+    checkAdmin();
+    }, [user]);
 
     useEffect(() => {
 
@@ -90,7 +113,64 @@ export default function Apartments() {
                                     'text-5xl font-semibold tracking-tight',
                                 )}
                             >
-                                {apartment.priceDaily}
+                                 {editingPrice === apartment.id ? (
+                                  <>
+                                    <input
+                                      type="number"
+                                      value={newPrice}
+                                      onChange={(e) => setNewPrice(e.target.value)}
+                                      className="w-24 rounded-md border px-2 py-1"
+                                    />
+                                    <button
+                                      onClick={async () => {
+                                        try {
+                                          await updateDoc(doc(db, "apartments", apartment.id), {
+                                            priceDaily: Number(newPrice),
+                                          });
+                                          setApartments((prev) =>
+                                            prev.map((a) =>
+                                              a.id === apartment.id ? { ...a, priceDaily: Number(newPrice) } : a
+                                            )
+                                          );
+                                          setEditingPrice(null);
+                                        } catch (err) {
+                                          console.error("Failed to update price", err);
+                                        }
+                                      }}
+                                      className="btn-orange ml-2"
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      onClick={() => setEditingPrice(null)}
+                                      className="btn-orange ml-2"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span
+                                      className={classNames(
+                                        apartment.featured ? "text-white" : "text-gray-900",
+                                        "text-5xl font-semibold tracking-tight"
+                                      )}
+                                    >
+                                      {apartment.priceDaily}
+                                    </span>
+                                    {isAdmin && (
+                                      <button
+                                        onClick={() => {
+                                          setEditingPrice(apartment.id);
+                                          setNewPrice(apartment.priceDaily);
+                                        }}
+                                        className="ml-4 text-sm bg-orange-500 text-white px-2 py-1 rounded hover:bg-orange-600"
+                                      >
+                                        Edit Price
+                                      </button>
+                                    )}
+                                  </>
+                                )}
                             </span>
                             <span className={classNames(apartment.featured ? 'text-gray-400' : 'text-white-900', 'text-base')}>
                                 € Euro<UserIcon className="inline-block w-5 h-5 text-gray-500 ml-1" /> / day
