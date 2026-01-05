@@ -97,13 +97,13 @@ export default function ApartmentDetails() {
 
   // Show Phone
   const handlePhoneBtn = () => {
-    if (isAuthenticated) {
+    // if (isAuthenticated) {
       setShowPhone(!showPhone);
-    } else {
-      navigate("/login");
-      alert("You must be logged in to access the phone number.");
+    // } else {
+    //   navigate("/login");
+    //   alert("You must be logged in to access the phone number.");
     }
-  };
+  // };
 
   // Reservation
   const handleReservation = async () => {
