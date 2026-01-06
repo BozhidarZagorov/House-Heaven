@@ -1,24 +1,50 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from "../config/firebaseinit"
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebaseinit";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [authLoading, setAuthLoading] = useState(true);
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-            setIsAuthenticated(!!currentUser);
+        useEffect(() => {
+            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                setUser(currentUser);
+                setIsAuthenticated(!!currentUser);
+              
+             if (!currentUser) {
+          setIsAdmin(false);
+          setAuthLoading(false);
+          return;
+        }
+      
+          const checkAdmin = async () => {
+            try {
+              const adminRef = doc(db, "admin", currentUser.uid);
+              const adminSnap = await getDoc(adminRef);
+              setIsAdmin(adminSnap.exists());
+            } catch (err) {
+              console.error("Admin check failed:", err);
+              setIsAdmin(false);
+            } finally {
+              setAuthLoading(false);
+            }
+          };
+      
+          checkAdmin(); // call async function
         });
+
 
         return () => unsubscribe(); //clean up on unmount
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, authLoading }}>
             {children}
         </AuthContext.Provider>
     );
