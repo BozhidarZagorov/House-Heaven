@@ -67,7 +67,7 @@ export default function Header() {
                     <div className="flex items-center justify-between">
                         <Link to="/" className="navbar-logo">
                             <span className="sr-only">GuestHouse Heaven</span>
-                            <img alt="" src="https://res.cloudinary.com/dbleq6bwe/image/upload/v1743596556/qk8auroedexyzsikdoyc.png" />
+                            <img alt="" src="https://res.cloudinary.com/dbleq6bwe/image/upload/v1767396248/prhouse_iqxjut.png" />
                         </Link>
                         <button type="button" onClick={() => setMobileMenuOpen(false)} className="menu-button">
                             <span className="sr-only">Close menu</span>
