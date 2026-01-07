@@ -1,9 +1,10 @@
 .contactground-container {
     position: relative;
     isolation: isolate;
-    padding-left: 1.5rem; /* px-6 */
+    padding-left: 1.5rem; 
     padding-right: 1.5rem;
-    padding-top: 3.5rem; /* pt-14 */
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
     min-height: 100vh;
     background-image: url("https://res.cloudinary.com/dbleq6bwe/image/upload/v1743081072/w4aenrugzvmbhwqsesyi.jpg");
     background-size: cover;
