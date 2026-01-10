@@ -286,7 +286,7 @@ export default function ApartmentDetails() {
                 }
               />
 
-              {/* VERIFIED USER → show reservation button */}
+              {/* VERIFIED USER */}
                 {isAuthenticated && user?.emailVerified && (
                   <button
                     disabled={!range?.from || !range?.to}
@@ -303,7 +303,7 @@ export default function ApartmentDetails() {
                   </button>
                 )}
 
-                {/* LOGGED IN BUT NOT VERIFIED → show resend button */}
+                {/* LOGGED IN BUT NOT VERIFIED */}
                 {isAuthenticated && user && !user.emailVerified && (
                   <button
                     onClick={async () => {
@@ -321,7 +321,7 @@ export default function ApartmentDetails() {
                   </button>
                 )}
 
-                {/* NOT LOGGED IN → optional message */}
+                {/* NOT LOGGED IN */}
                 {!isAuthenticated && (
                   <p className="mt-4 text-center text-sm text-gray-500">
                     Please log in to make a reservation.
