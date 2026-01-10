@@ -30,7 +30,10 @@ export default function Login (){
     const password = passwordRef.current.value;
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCredentials.user.emailVerified) {
+        alert("Please verify your email to have access to functionality.");
+      }
       console.log("User logged in:", email);
       navigate("/"); // Redirect to Home
     } catch (err) {
