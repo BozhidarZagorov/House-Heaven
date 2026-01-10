@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router"
 import { auth } from "/public/config/firebaseinit"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth"
 import { useAuth } from '/public/ctx/FirebaseAuth'
 
 export default function Register (){
@@ -31,7 +31,10 @@ export default function Register (){
     const password = passwordRef.current.value;
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredentials=await createUserWithEmailAndPassword(auth, email, password);
+
+      await sendEmailVerification(userCredentials.user)
+      alert("Verification email sent. Please check your inbox.");
       // console.log("User registered:", email);
       navigate("/"); // Redirect to Home
     } catch (err) {

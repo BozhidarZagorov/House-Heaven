@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { doc, getDoc, collection, addDoc, query, where, getDocs, Timestamp, runTransaction } from 'firebase/firestore'
 import { db } from '/public/config/firebaseinit'
+import { sendEmailVerification } from "firebase/auth";
 import { useAuth } from '/public/ctx/FirebaseAuth'
+import { auth } from "/public/config/firebaseinit";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 
@@ -284,19 +286,47 @@ export default function ApartmentDetails() {
                 }
               />
 
-              <button
-                disabled={!range?.from || !range?.to}
-                onClick={handleReservation}
-                className={`mt-4 w-full rounded-md px-4 py-2 font-semibold text-white transition
-                  ${
-                    range?.from && range?.to
-                      ? "bg-orange-500 hover:bg-orange-600"
-                      : "cursor-not-allowed bg-gray-300"
-                  }
-                `}
-              >
-                Make a reservation
-              </button>
+              {/* VERIFIED USER */}
+                {isAuthenticated && user?.emailVerified && (
+                  <button
+                    disabled={!range?.from || !range?.to}
+                    onClick={handleReservation}
+                    className={`mt-4 w-full rounded-md px-4 py-2 font-semibold text-white transition
+                      ${
+                        range?.from && range?.to
+                          ? "bg-orange-500 hover:bg-orange-600"
+                          : "cursor-not-allowed bg-gray-300"
+                      }
+                    `}
+                  >
+                    Make a reservation
+                  </button>
+                )}
+
+                {/* LOGGED IN BUT NOT VERIFIED */}
+                {isAuthenticated && user && !user.emailVerified && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        await sendEmailVerification(auth.currentUser);
+                        alert("Verification email sent. Please check your inbox and spam box in 10-15 minutes. ");
+                      } catch (err) {
+                        console.error(err);
+                        alert("Failed to send verification email.");
+                      }
+                    }}
+                    className="mt-4 w-full text-sm text-orange-600 underline"
+                  >
+                    Verify your email to make a reservation
+                  </button>
+                )}
+
+                {/* NOT LOGGED IN */}
+                {!isAuthenticated && (
+                  <p className="mt-4 text-center text-sm text-gray-500">
+                    Please log in to make a reservation.
+                  </p>
+                )}
             </div>
           </div>
 
