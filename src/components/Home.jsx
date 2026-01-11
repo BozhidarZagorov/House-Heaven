@@ -81,9 +81,9 @@ export default function Home() {
     >
       <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
         <div className="text-container text-center">
-          <h1 className="main-title">GuestHouse Heaven</h1>
+          <h1 className="main-title">GuestHouse Haven</h1>
           <p className="main-subtitle">
-            Reel in the Adventure, Live the Moment!
+            Explore Rodopa Mountain's Hidden Paradice
           </p>
 
           <div className="mt-10 flex items-center justify-center gap-x-6">

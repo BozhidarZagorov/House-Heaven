@@ -4,7 +4,7 @@ export default function TermsOfService() {
       <h1 className="text-4xl font-bold mb-6">Terms of Service</h1>
 
       <p className="mb-4">
-        Welcome to our GuestHouse Heaven app. By using our services, you agree to these Terms of Service. Please read them carefully.
+        Welcome to our GuestHouse Haven app. By using our services, you agree to these Terms of Service. Please read them carefully.
       </p>
 
       <h2 className="text-2xl font-semibold mt-6 mb-2">1. Acceptance of Terms</h2>
@@ -75,7 +75,9 @@ export default function TermsOfService() {
         We may update these Terms of Service from time to time. Continued use of the app after changes are made constitutes acceptance of the new terms.
       </p>
 
-      <p className="mt-6">Last updated: {new Date().toLocaleDateString()}</p>
+      {/* <p className="mt-6">Last updated: {new Date().toLocaleDateString()}</p> */}
+      
+      <p className="mt-6">Last updated: 11.01.2026</p>
     </div>
   );
 }

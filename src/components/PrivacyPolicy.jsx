@@ -4,7 +4,7 @@ export default function PrivacyPolicy() {
       <h1 className="text-4xl font-bold mb-6">Privacy Policy</h1>
       <p className="mb-4">
         This Privacy Policy outlines how we collect, use, and protect your
-        personal data when using our GuestHouse Heaven app.
+        personal data when using our GuestHouse Haven app.
       </p>
 
       <h2 className="text-2xl font-semibold mt-6">

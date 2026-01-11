@@ -7,6 +7,7 @@ import { useAuth } from '/public/ctx/FirebaseAuth'
 import { auth } from "/public/config/firebaseinit";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
+import GoogleMap from './GoogleMap';
 
 export default function ApartmentDetails() {
   const { apartmentId } = useParams();
@@ -494,7 +495,11 @@ export default function ApartmentDetails() {
                 )}
               </div>
             )}
-
+            <h3 className="text-lg font-semibold">
+              {/* 📍 Вила Рай – Доспат */}
+              📍 GuestHouse Haven – Dospat
+                <GoogleMap />
+            </h3>
         </div>
       </div>
     </div>
