@@ -23,6 +23,10 @@ export default function ApartmentDetails() {
   const [range, setRange] = useState({ from: undefined, to: undefined });
   const [bookedRanges, setBookedRanges] = useState([]);
 
+  const [adminReservations, setAdminReservations] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [confirmingId, setConfirmingId] = useState(null);
+
   // Fetch Apartment
 
   useEffect(() => {
@@ -207,6 +211,64 @@ export default function ApartmentDetails() {
     }
   };
 
+
+
+
+  useEffect(() => {
+  if (!isAdmin || !apartmentId) return;
+
+  const fetchAdminReservations = async () => {
+    const start = new Date(
+      selectedMonth.getFullYear(),
+      selectedMonth.getMonth(),
+      1
+    );
+
+    const end = new Date(
+      selectedMonth.getFullYear(),
+      selectedMonth.getMonth() + 1,
+      0
+    );
+
+    const q = query(
+      collection(db, "reservations"),
+      where("apartmentId", "==", apartmentId),
+      where("status", "==", "active"),
+      where("to", ">=", Timestamp.fromDate(start)),
+      where("from", "<=", Timestamp.fromDate(end))
+    );
+
+    const snap = await getDocs(q);
+
+    setAdminReservations(
+      snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+    );
+  };
+
+  fetchAdminReservations();
+}, [isAdmin, apartmentId, selectedMonth]);
+
+  const cancelReservation = async (id) => {
+  const ref = doc(db, "reservations", id);
+
+  await runTransaction(db, async (tx) => {
+    tx.update(ref, {
+      status: "cancelled",
+      cancelledAt: Timestamp.now(),
+    });
+  });
+
+  setAdminReservations((prev) =>
+    prev.filter((r) => r.id !== id)
+  );
+};
+
+
+
+
   // Visible Images
   const visibleImages =
     apartment?.imgsUrl?.length > 0
@@ -357,7 +419,7 @@ export default function ApartmentDetails() {
                 )}
             </div>
           </div>
-
+            
           <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pr-8 lg:pb-16">
             {/* Details */}
             <div>
@@ -367,6 +429,72 @@ export default function ApartmentDetails() {
               </div>
             </div>
           </div>
+
+            {isAdmin && (
+              <div className="mt-10 rounded-lg border bg-white p-4 shadow">
+                <h2 className="mb-4 text-lg font-semibold">Admin table – Reservations</h2>
+                      
+                {/* Month selector */}
+                <input
+                  type="month"
+                  value={`${selectedMonth.getFullYear()}-${String(
+                    selectedMonth.getMonth() + 1
+                  ).padStart(2, "0")}`}
+                  onChange={(e) =>
+                    setSelectedMonth(new Date(e.target.value + "-01"))
+                  }
+                  className="mb-4 rounded border px-3 py-1"
+                />
+
+                {adminReservations.length === 0 ? (
+                  <p className="text-sm text-gray-500">No reservations for this month.</p>
+                ) : (
+                  <table className="w-full border-collapse text-sm">
+                    <tbody>
+                      {adminReservations.map((r) => {
+                        const from = r.from.toDate().toLocaleDateString("en-GB");
+                        const to = r.to.toDate().toLocaleDateString("en-GB");
+                      
+                        return (
+                          <tr key={r.id} className="border-b">
+                            <td className="py-2">
+                              {from} – {to}
+                            </td>
+                        
+                            <td className="py-2 text-right">
+                              {confirmingId === r.id ? (
+                                <div className="flex justify-end gap-3">
+                                  <button
+                                    onClick={() => cancelReservation(r.id)}
+                                    className="text-red-600 hover:underline"
+                                  >
+                                    Confirm
+                                  </button>
+                                  <button
+                                    onClick={() => setConfirmingId(null)}
+                                    className="text-gray-500 hover:underline"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setConfirmingId(r.id)}
+                                  className="text-orange-600 hover:underline"
+                                >
+                                  Remove
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+
         </div>
       </div>
     </div>
